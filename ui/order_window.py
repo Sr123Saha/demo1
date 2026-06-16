@@ -17,7 +17,7 @@ class OrderWindow(QMainWindow):
         self.parent_window = parent
         self.order_id = order_id
         self.is_edit = order_id is not None
-        self.selected_items = []  # Список выбранных товаров [{product_id, quantity}]
+        self.selected_items = []
         
         self.setWindowTitle("Редактирование заказа" if self.is_edit else "Добавление заказа")
         self.setGeometry(200, 100, 900, 700)
@@ -85,12 +85,11 @@ class OrderWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(30, 30, 30, 30)
         
-        # Заголовок
         title = QLabel("✏️ Редактирование заказа" if self.is_edit else "➕ Добавление заказа")
         title.setStyleSheet("font-size: 20px; font-weight: bold; color: #2C4360;")
         layout.addWidget(title)
         
-        # Основная информация о заказе
+        # Информация о заказе
         info_group = QGroupBox("Информация о заказе")
         info_group.setStyleSheet("""
             QGroupBox {
@@ -113,14 +112,12 @@ class OrderWindow(QMainWindow):
         
         row = 0
         
-        # Номер заказа
         info_layout.addWidget(QLabel("Номер заказа:*"), row, 0)
         self.order_number_input = QLineEdit()
         self.order_number_input.setPlaceholderText("Введите номер заказа")
         info_layout.addWidget(self.order_number_input, row, 1)
         row += 1
         
-        # Клиент
         info_layout.addWidget(QLabel("Клиент:*"), row, 0)
         self.client_combo = QComboBox()
         self.client_combo.setEditable(True)
@@ -130,7 +127,6 @@ class OrderWindow(QMainWindow):
         info_layout.addWidget(self.client_combo, row, 1)
         row += 1
         
-        # Пункт выдачи
         info_layout.addWidget(QLabel("Пункт выдачи:*"), row, 0)
         self.pickup_combo = QComboBox()
         for point in get_all_pickup_points():
@@ -138,7 +134,6 @@ class OrderWindow(QMainWindow):
         info_layout.addWidget(self.pickup_combo, row, 1)
         row += 1
         
-        # Дата заказа
         info_layout.addWidget(QLabel("Дата заказа:*"), row, 0)
         self.order_date_edit = QDateEdit()
         self.order_date_edit.setCalendarPopup(True)
@@ -146,7 +141,6 @@ class OrderWindow(QMainWindow):
         info_layout.addWidget(self.order_date_edit, row, 1)
         row += 1
         
-        # Дата доставки
         info_layout.addWidget(QLabel("Дата доставки:"), row, 0)
         self.delivery_date_edit = QDateEdit()
         self.delivery_date_edit.setCalendarPopup(True)
@@ -154,14 +148,12 @@ class OrderWindow(QMainWindow):
         info_layout.addWidget(self.delivery_date_edit, row, 1)
         row += 1
         
-        # Код получения
         info_layout.addWidget(QLabel("Код получения:*"), row, 0)
         self.pickup_code_input = QLineEdit()
         self.pickup_code_input.setPlaceholderText("Введите код для получения")
         info_layout.addWidget(self.pickup_code_input, row, 1)
         row += 1
         
-        # Статус
         info_layout.addWidget(QLabel("Статус:*"), row, 0)
         self.status_combo = QComboBox()
         self.status_combo.addItems(["Новый", "Завершен"])
@@ -189,7 +181,6 @@ class OrderWindow(QMainWindow):
         """)
         items_layout = QVBoxLayout(items_group)
         
-        # Кнопки управления товарами
         btn_layout = QHBoxLayout()
         add_item_btn = QPushButton("➕ Добавить товар")
         add_item_btn.setObjectName("add_item")
@@ -203,7 +194,6 @@ class OrderWindow(QMainWindow):
         btn_layout.addStretch()
         items_layout.addLayout(btn_layout)
         
-        # Таблица товаров
         self.items_table = QTableWidget()
         self.items_table.setColumnCount(4)
         self.items_table.setHorizontalHeaderLabels([
@@ -216,7 +206,6 @@ class OrderWindow(QMainWindow):
         
         layout.addWidget(items_group)
         
-        # Итого
         total_layout = QHBoxLayout()
         total_layout.addStretch()
         self.total_label = QLabel("ИТОГО: 0 ₽")
@@ -224,7 +213,6 @@ class OrderWindow(QMainWindow):
         total_layout.addWidget(self.total_label)
         layout.addLayout(total_layout)
         
-        # Кнопки
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         
@@ -240,35 +228,29 @@ class OrderWindow(QMainWindow):
         
         layout.addLayout(btn_layout)
         
-        # Если редактируем, загружаем данные
         if self.is_edit:
             self.load_order_data()
     
     def load_order_data(self):
-        """Загрузка данных заказа для редактирования"""
         order = get_order_by_id(self.order_id)
         if not order:
             QMessageBox.critical(self, "Ошибка", "Заказ не найден")
             self.close()
             return
         
-        # Заполняем поля
         self.order_number_input.setText(str(order['order_number']))
         self.order_number_input.setReadOnly(True)
         
-        # Выбираем клиента
         for i in range(self.client_combo.count()):
             if self.client_combo.itemData(i) == order['user_id']:
                 self.client_combo.setCurrentIndex(i)
                 break
         
-        # Выбираем пункт выдачи
         for i in range(self.pickup_combo.count()):
             if self.pickup_combo.itemData(i) == order['pickup_point_id']:
                 self.pickup_combo.setCurrentIndex(i)
                 break
         
-        # Даты
         if order['order_date']:
             date = QDate.fromString(order['order_date'], "yyyy-MM-dd")
             self.order_date_edit.setDate(date)
@@ -280,7 +262,6 @@ class OrderWindow(QMainWindow):
         self.pickup_code_input.setText(order['pickup_code'])
         self.status_combo.setCurrentText(order['status'])
         
-        # Загружаем товары
         items = get_order_items(self.order_id)
         self.selected_items = []
         for item in items:
@@ -292,7 +273,6 @@ class OrderWindow(QMainWindow):
         self.update_items_table()
     
     def add_item(self):
-        """Добавление товара в заказ"""
         dialog = QDialog(self)
         dialog.setWindowTitle("Добавить товар")
         dialog.setFixedSize(400, 200)
@@ -300,7 +280,6 @@ class OrderWindow(QMainWindow):
         
         layout = QVBoxLayout(dialog)
         
-        # Выбор товара
         layout.addWidget(QLabel("Выберите товар:"))
         product_combo = QComboBox()
         products = get_all_products()
@@ -308,7 +287,6 @@ class OrderWindow(QMainWindow):
             product_combo.addItem(f"{p['article']} - {p['name']} ({p['price']} ₽)", p['id'])
         layout.addWidget(product_combo)
         
-        # Количество
         layout.addWidget(QLabel("Количество:"))
         quantity_spin = QSpinBox()
         quantity_spin.setMinimum(1)
@@ -316,7 +294,6 @@ class OrderWindow(QMainWindow):
         quantity_spin.setValue(1)
         layout.addWidget(quantity_spin)
         
-        # Кнопки
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         
@@ -356,17 +333,15 @@ class OrderWindow(QMainWindow):
         dialog.exec_()
     
     def confirm_add_item(self, dialog, product_combo, quantity_spin):
-        """Подтверждение добавления товара"""
         product_id = product_combo.currentData()
         quantity = quantity_spin.value()
         
-        # Проверяем, нет ли уже такого товара
         for item in self.selected_items:
             if item['product_id'] == product_id:
                 QMessageBox.warning(
                     self, 
                     "Внимание", 
-                    "Этот товар уже добавлен в заказ. Отредактируйте количество в таблице."
+                    "Этот товар уже добавлен в заказ."
                 )
                 dialog.reject()
                 return
@@ -380,7 +355,6 @@ class OrderWindow(QMainWindow):
         dialog.accept()
     
     def remove_item(self):
-        """Удаление выбранного товара из заказа"""
         current_row = self.items_table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "Внимание", "Выберите товар для удаления")
@@ -398,7 +372,6 @@ class OrderWindow(QMainWindow):
             self.update_items_table()
     
     def update_items_table(self):
-        """Обновление таблицы с товарами"""
         self.items_table.setRowCount(len(self.selected_items))
         total = 0
         
@@ -460,9 +433,15 @@ class OrderWindow(QMainWindow):
                 add_order(order_data, items)
                 QMessageBox.information(self, "Успех", "Заказ добавлен")
             
-            # Обновляем список в главном окне
+            # Обновляем таблицу в главном окне
             if self.parent_window:
-                self.parent_window.load_orders()
+                # Обновляем товары
+                if hasattr(self.parent_window, 'load_products'):
+                    self.parent_window.load_products()
+                
+                # Обновляем заказы
+                if hasattr(self.parent_window, 'load_orders'):
+                    self.parent_window.load_orders()
             
             self.close()
             

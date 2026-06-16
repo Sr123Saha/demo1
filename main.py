@@ -9,7 +9,7 @@ from config import RESOURCES_DIR
 
 def main():
     init_database()
-    # import_all_data()  # Раскомментировано для первого запуска
+    #import_all_data()  # Раскомментировано для первого запуска
     
     app = QApplication(sys.argv)
     

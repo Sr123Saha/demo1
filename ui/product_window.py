@@ -22,7 +22,7 @@ class ProductWindow(QMainWindow):
         
         self.setWindowTitle("Редактирование товара" if self.is_edit else "Добавление товара")
         self.setFixedSize(700, 700)
-        self.setModal(True)
+        self.setWindowModality(Qt.ApplicationModal)  # <-- ИСПРАВЛЕНО!
         
         self.setStyleSheet(f"""
             QMainWindow {{ background-color: {COLORS['main_background']}; }}
@@ -71,7 +71,6 @@ class ProductWindow(QMainWindow):
         layout.setSpacing(15)
         layout.setContentsMargins(30, 30, 30, 30)
         
-        # Заголовок
         title = QLabel("✏️ Редактирование товара" if self.is_edit else "➕ Добавление товара")
         title.setStyleSheet("font-size: 20px; font-weight: bold; color: #2C4360;")
         layout.addWidget(title)
@@ -197,12 +196,10 @@ class ProductWindow(QMainWindow):
         
         layout.addLayout(btn_layout)
         
-        # Если редактируем, загружаем данные
         if self.is_edit:
             self.load_product_data()
     
     def load_product_data(self):
-        """Загрузка данных товара для редактирования"""
         product = get_product_by_article(self.article)
         if not product:
             QMessageBox.critical(self, "Ошибка", "Товар не найден")
@@ -220,13 +217,11 @@ class ProductWindow(QMainWindow):
         self.quantity_input.setText(str(product['quantity']))
         self.discount_input.setText(str(product['discount']))
         
-        # Загружаем фото
         if product['image_path'] and os.path.exists(str(IMAGES_DIR / product['image_path'])):
             self.load_image_to_label(str(IMAGES_DIR / product['image_path']))
             self.image_filename = product['image_path']
     
     def load_image_to_label(self, image_path):
-        """Загрузка изображения в метку"""
         try:
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
@@ -237,7 +232,6 @@ class ProductWindow(QMainWindow):
             print(f"Ошибка загрузки фото: {e}")
     
     def upload_image(self):
-        """Загрузка нового изображения"""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Выберите изображение", "",
             "Изображения (*.png *.jpg *.jpeg *.bmp *.gif)"
@@ -247,18 +241,13 @@ class ProductWindow(QMainWindow):
             return
         
         try:
-            # Проверяем размер
             with Image.open(file_path) as img:
-                # Изменяем размер
                 img.thumbnail((MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT), Image.Resampling.LANCZOS)
-                
-                # Создаём белый фон
                 new_img = Image.new('RGB', (MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT), (255, 255, 255))
                 x = (MAX_IMAGE_WIDTH - img.width) // 2
                 y = (MAX_IMAGE_HEIGHT - img.height) // 2
                 new_img.paste(img, (x, y))
                 
-                # Сохраняем
                 filename = f"product_{hash(file_path)}.jpg"
                 target_path = IMAGES_DIR / filename
                 new_img.save(target_path, 'JPEG', quality=85)
@@ -270,9 +259,7 @@ class ProductWindow(QMainWindow):
             QMessageBox.critical(self, "Ошибка", f"Не удалось обработать изображение: {e}")
     
     def save_product(self):
-        """Сохранение товара"""
         try:
-            # Проверка обязательных полей
             if not self.name_input.text().strip():
                 QMessageBox.warning(self, "Ошибка", "Введите наименование товара")
                 return
@@ -289,7 +276,6 @@ class ProductWindow(QMainWindow):
                 QMessageBox.warning(self, "Ошибка", "Выберите поставщика")
                 return
             
-            # Проверка цены
             try:
                 price = float(self.price_input.text().strip().replace(',', '.'))
                 if price < 0:
@@ -299,7 +285,6 @@ class ProductWindow(QMainWindow):
                 QMessageBox.warning(self, "Ошибка", "Введите корректную цену (например: 199.99)")
                 return
             
-            # Проверка количества
             try:
                 quantity = int(self.quantity_input.text().strip())
                 if quantity < 0:
@@ -309,7 +294,6 @@ class ProductWindow(QMainWindow):
                 QMessageBox.warning(self, "Ошибка", "Введите корректное количество")
                 return
             
-            # Проверка скидки
             try:
                 discount = int(self.discount_input.text().strip() or '0')
                 if discount < 0 or discount > 100:
@@ -319,7 +303,6 @@ class ProductWindow(QMainWindow):
                 QMessageBox.warning(self, "Ошибка", "Введите корректную скидку")
                 return
             
-            # Собираем данные
             product_data = {
                 'article': self.article_input.text().strip(),
                 'name': self.name_input.text().strip(),
@@ -334,20 +317,17 @@ class ProductWindow(QMainWindow):
                 'image_path': self.image_filename or ''
             }
             
-            # Сохраняем
             if self.is_edit:
                 product = get_product_by_article(self.article)
                 update_product(product['id'], product_data)
                 QMessageBox.information(self, "Успех", "Товар обновлён")
             else:
-                # Проверка уникальности артикула
                 if get_product_by_article(product_data['article']):
                     QMessageBox.warning(self, "Ошибка", "Товар с таким артикулом уже существует")
                     return
                 add_product(product_data)
                 QMessageBox.information(self, "Успех", "Товар добавлен")
             
-            # Обновляем список в главном окне
             if self.parent_window:
                 self.parent_window.load_products()
             
