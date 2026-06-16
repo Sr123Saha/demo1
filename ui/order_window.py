@@ -21,7 +21,7 @@ class OrderWindow(QMainWindow):
         
         self.setWindowTitle("Редактирование заказа" if self.is_edit else "Добавление заказа")
         self.setGeometry(200, 100, 900, 700)
-        self.setModal(True)
+        self.setWindowModality(Qt.ApplicationModal)  # <-- ИСПРАВЛЕНО!
         
         self.setStyleSheet(f"""
             QMainWindow {{ background-color: {COLORS['main_background']}; }}
@@ -276,7 +276,7 @@ class OrderWindow(QMainWindow):
         dialog = QDialog(self)
         dialog.setWindowTitle("Добавить товар")
         dialog.setFixedSize(400, 200)
-        dialog.setModal(True)
+        dialog.setWindowModality(Qt.ApplicationModal)  # <-- ИСПРАВЛЕНО!
         
         layout = QVBoxLayout(dialog)
         
@@ -439,7 +439,7 @@ class OrderWindow(QMainWindow):
                 if hasattr(self.parent_window, 'load_products'):
                     self.parent_window.load_products()
                 
-                # Обновляем заказы
+                # Обновляем заказы (если есть метод)
                 if hasattr(self.parent_window, 'load_orders'):
                     self.parent_window.load_orders()
             
