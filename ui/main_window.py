@@ -63,7 +63,6 @@ class MainWindow(QMainWindow):
         if self.is_manager or self.is_admin:
             filter_panel = QHBoxLayout()
             
-            # Поиск
             search_label = QLabel("🔍 Поиск:")
             search_label.setStyleSheet("font-family: 'Comic Sans MS'; font-size: 13px;")
             filter_panel.addWidget(search_label)
@@ -74,7 +73,6 @@ class MainWindow(QMainWindow):
             self.search_input.setStyleSheet("padding: 8px; border: 2px solid #ABCFCE; border-radius: 6px; font-family: 'Comic Sans MS';")
             filter_panel.addWidget(self.search_input)
             
-            # Фильтр по скидке
             filter_panel.addSpacing(10)
             filter_label = QLabel("Скидка:")
             filter_label.setStyleSheet("font-family: 'Comic Sans MS'; font-size: 13px;")
@@ -86,7 +84,6 @@ class MainWindow(QMainWindow):
             self.discount_filter.setStyleSheet("padding: 5px; font-family: 'Comic Sans MS';")
             filter_panel.addWidget(self.discount_filter)
             
-            # Сортировка
             filter_panel.addSpacing(10)
             sort_label = QLabel("Сортировка:")
             sort_label.setStyleSheet("font-family: 'Comic Sans MS'; font-size: 13px;")
@@ -156,7 +153,6 @@ class MainWindow(QMainWindow):
             btn_panel.addStretch()
             main_layout.addLayout(btn_panel)
         
-        # Кнопки управления (для менеджера)
         elif self.is_manager:
             btn_panel = QHBoxLayout()
             
@@ -207,11 +203,9 @@ class MainWindow(QMainWindow):
         
         main_layout.addWidget(self.table)
         
-        # Загружаем данные
         self.load_products()
     
     def load_products(self):
-        """Загрузка и отображение товаров"""
         filters = {}
         
         if hasattr(self, 'search_input') and self.search_input.text():
@@ -257,7 +251,6 @@ class MainWindow(QMainWindow):
             self.table.setItem(i, 2, QTableWidgetItem(product['category']))
             self.table.setItem(i, 3, QTableWidgetItem(product['manufacturer']))
             
-            # Цена
             price_widget = QWidget()
             price_layout = QHBoxLayout(price_widget)
             price_layout.setContentsMargins(5, 2, 5, 2)
@@ -282,20 +275,17 @@ class MainWindow(QMainWindow):
             price_layout.addStretch()
             self.table.setCellWidget(i, 4, price_widget)
             
-            # Количество
             qty_item = QTableWidgetItem(str(product['quantity']))
             if product['quantity'] == 0:
                 qty_item.setBackground(QColor(COLORS['disabled']))
                 qty_item.setForeground(QColor("white"))
             self.table.setItem(i, 5, qty_item)
             
-            # Скидка
             discount_item = QTableWidgetItem(f"{discount}%")
             if discount > 25:
                 discount_item.setBackground(QColor(COLORS['discount_highlight']))
             self.table.setItem(i, 6, discount_item)
             
-            # Фото
             image_path = product.get('image_path')
             photo_widget = QLabel()
             photo_widget.setAlignment(Qt.AlignCenter)
@@ -364,7 +354,6 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Ошибка", str(e))
     
     def open_orders(self):
-        """Открытие окна со списком заказов"""
         dialog = QDialog(self)
         dialog.setWindowTitle("Управление заказами")
         dialog.setGeometry(100, 50, 1200, 700)

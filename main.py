@@ -3,13 +3,13 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 from database import init_database
-from imports import import_all_data
+# from imports import import_all_data  # раскомментируй при первом запуске
 from ui.login_window import LoginWindow
 from config import RESOURCES_DIR
 
 def main():
     init_database()
-    #import_all_data()  # Раскомментировано для первого запуска
+    # import_all_data()  # раскомментируй при первом запуске
     
     app = QApplication(sys.argv)
     

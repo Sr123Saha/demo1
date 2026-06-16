@@ -1,9 +1,7 @@
-
 # ui/login_window.py
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QPixmap
 from database import get_user_by_login_password
 from config import COLORS, RESOURCES_DIR
 
@@ -59,7 +57,6 @@ class LoginWindow(QMainWindow):
         layout.setSpacing(20)
         layout.setContentsMargins(50, 40, 50, 40)
         
-        # Логотип
         logo_label = QLabel()
         logo_path = RESOURCES_DIR / "logo.png"
         if logo_path.exists():
@@ -70,7 +67,6 @@ class LoginWindow(QMainWindow):
                 logo_label.setAlignment(Qt.AlignCenter)
                 layout.addWidget(logo_label)
         
-        # Заголовок
         title = QLabel("📚 Добро пожаловать!")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 26px; font-weight: bold; color: #2C4360; font-family: 'Comic Sans MS';")
@@ -83,7 +79,6 @@ class LoginWindow(QMainWindow):
         
         layout.addSpacing(10)
         
-        # Поле логина
         login_label = QLabel("👤 Логин:")
         login_label.setStyleSheet("font-weight: bold;")
         layout.addWidget(login_label)
@@ -93,7 +88,6 @@ class LoginWindow(QMainWindow):
         self.login_input.returnPressed.connect(self.login)
         layout.addWidget(self.login_input)
         
-        # Поле пароля
         password_label = QLabel("🔒 Пароль:")
         password_label.setStyleSheet("font-weight: bold;")
         layout.addWidget(password_label)
@@ -106,7 +100,6 @@ class LoginWindow(QMainWindow):
         
         layout.addSpacing(10)
         
-        # Кнопка входа
         self.login_btn = QPushButton("🔑 Войти")
         self.login_btn.clicked.connect(self.login)
         self.login_btn.setStyleSheet(f"""
@@ -126,7 +119,6 @@ class LoginWindow(QMainWindow):
         """)
         layout.addWidget(self.login_btn)
         
-        # Кнопка "Войти как гость"
         self.guest_btn = QPushButton("👤 Войти как гость")
         self.guest_btn.clicked.connect(self.guest_login)
         self.guest_btn.setStyleSheet(f"""
@@ -146,7 +138,6 @@ class LoginWindow(QMainWindow):
         """)
         layout.addWidget(self.guest_btn)
         
-        # Метка для ошибок
         self.error_label = QLabel("")
         self.error_label.setAlignment(Qt.AlignCenter)
         self.error_label.setStyleSheet("color: red; font-size: 13px; min-height: 30px; font-family: 'Comic Sans MS';")
@@ -155,7 +146,6 @@ class LoginWindow(QMainWindow):
         layout.addStretch()
     
     def login(self):
-        """Обработка авторизации"""
         login = self.login_input.text().strip()
         password = self.password_input.text().strip()
         
@@ -176,11 +166,9 @@ class LoginWindow(QMainWindow):
             self.password_input.setFocus()
     
     def guest_login(self):
-        """Вход как гость"""
         self.open_main_window(None)
     
     def open_main_window(self, user):
-        """Открытие главного окна"""
         from ui.main_window import MainWindow
         self.main_window = MainWindow(user)
         self.main_window.show()
