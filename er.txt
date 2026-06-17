@@ -1,0 +1,47 @@
+ draw.io  draw.io  draw.io
+Таблица Users:
+
+Поле	Тип	Ключ
+id	INTEGER	PK
+role	TEXT	
+full_name	TEXT	
+login	TEXT	
+password	TEXT	
+Таблица Products:
+
+Поле	Тип	Ключ
+id	INTEGER	PK
+article	TEXT	
+name	TEXT	
+unit	TEXT	
+price	REAL	
+supplier	TEXT	
+manufacturer	TEXT	
+category	TEXT	
+discount	INTEGER	
+quantity	INTEGER	
+description	TEXT	
+image_path	TEXT	
+Таблица PickupPoints:
+
+Поле	Тип	Ключ
+id	INTEGER	PK
+address	TEXT	
+Таблица Orders:
+
+Поле	Тип	Ключ
+id	INTEGER	PK
+order_number	INTEGER	
+order_date	TEXT	
+delivery_date	TEXT	
+pickup_point_id	INTEGER	FK
+user_id	INTEGER	FK
+pickup_code	TEXT	
+status	TEXT	
+Таблица OrderItems:
+
+Поле	Тип	Ключ
+id	INTEGER	PK
+order_id	INTEGER	FK
+product_id	INTEGER	FK
+quantity	INTEGER
